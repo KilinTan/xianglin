@@ -120,6 +120,9 @@ def getPID(process_name):
     if len(rs) != 1:
         pids = []
         for i in rs:
+            p = i.split()
+            if p[len(p) - 1] == process_name:
+               return int(p[1])
             pids.append(i.split()[1])
         print >> sys.stderr, "Get more then one PID (%s), please given a more accurate process name" % (", ".join(pids))
         return -1
