@@ -52,6 +52,7 @@ def write_allocation_block(fp, block):
     for b in block:
         fp.write(b+"\n")
     fp.write("\n")
+
 if __name__ == "__main__":
     if len(sys.argv) > 3:
         org_alloc = open(sys.argv[1], "r");
@@ -75,23 +76,3 @@ if __name__ == "__main__":
             break
     org_alloc.close()
     new_alloc.close()
-    
-#    print filter_str
-#    alloc_array = []
-#    flag = False
-#    write_flag = False
-#    for line in org_alloc:
-#        if line.find("Allocations:") == 0:
-#            if not flag:
-#                flag = True
-#            else:
-#                if (include and write_flag) or (not include and not write_flag):
-#                    for l in alloc_array:
-#                        new_alloc.write(l)
-#                        print l,
-#                alloc_array = []
-#                write_flag = False
-#        alloc_array.append(line)
-#        
-#        if line.find(filter_str) != -1:
-#            write_flag = True
