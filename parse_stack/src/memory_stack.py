@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from utils import shellcmd, execute_addr2line, search_file, find_addr2line
+from utils import shellcmd, execute_addr2line,\
+    check_args
 import sys
 import os
 import argparse
@@ -130,30 +131,8 @@ def generate_help(parser, category = False):
                         help="The allocation memory stack file",
                         metavar="file", required=required)
 
-def check_args(args):
-    if args.symbols is None:
-        sys.stderr.write("The symbols is required\n")
-        parser.print_help();
-        return 1
-    elif not os.path.exists(args.symbols):
-        sys.stderr.write("The symbols(%s) is not existed\n" %(args.symbols))
-        return 1
-
-    if args.ndk_home:
-        if os.path.exists(args.ndk_home):
-            args.addr2line = search_file(os.path.join(args.ndk_home, "toolchains"), "^arm.*addr2line$", True)
-        else:
-            sys.stderr.write("The path[%s] is incorrect android_ndk_home\n" %(args.ndk_home))
-            return 1
-    else:
-        args.addr2line = find_addr2line()
-    if not args.addr2line:
-        sys.stderr.write("Can find the addr2line command from the ANDROID_NDK_HOME.\n")
-        return 1
-    return 0
-
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser("memory_stack", description="Analyze the memory stack to check memory leak")
+    parser = argparse.ArgumentParser(description="Analyze the memory stack to check memory leak")
     generate_help(parser, False);
     args = parser.parse_args()
     rs = check_args(args)

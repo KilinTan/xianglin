@@ -25,7 +25,7 @@ from optparse import OptionParser
 sohead = re.compile('(.+\.so):')
 funchead = re.compile('([0-9a-f]{8}) <(.+)>:')
 funcline = re.compile('^[ ]+([0-9a-f]+):.+')
-crashline = re.compile('.+pc.([0-9a-f]{8})\s(.+?\.so).*')
+crashline = re.compile('.+pc.([0-9a-f]{8})\s.+?/(.+?\.so).*')
 
 def shellcmd(command):
     try:
