@@ -50,8 +50,9 @@ def search_file(directory, name, regular = False):
     return None
 
 def find_addr2line():
-    ndk_home_path = os.environ["ANDROID_NDK_HOME"]
-    if ndk_home_path == None:
+    if "ANDROID_NDK_HOME" in os.environ:
+        ndk_home_path = os.environ["ANDROID_NDK_HOME"]
+    else: 
         sys.stderr.write("Don't find the ANDROID_NDK_HOME environment in you OS\n");
         return None
 
