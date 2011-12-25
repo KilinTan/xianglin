@@ -97,9 +97,20 @@ def generate_help(parser, category=False):
     if not parser:
         return;
     required = True
-    parser.add_argument('-s', "--symbols", dest="symbols",
-                        help="Contains full path to the root directory for symbols.",
-                        metavar="path", required=True)
+    try:
+        parser.add_argument('-s', "--symbols", dest="symbols",
+                            help="Contains full path to the root directory for symbols.",
+                            metavar="path", required=True)
+        parser.add_argument("-o", "--out", dest="out",
+                            help="write the result into the out file. If omitted,"
+                            " the result is written into the stdout",
+                            metavar="file")
+        parser.add_argument("--android_ndk_home", dest="ndk_home",
+                            help="path of the Android NDK home[optional]. If omitted,"
+                            " get it from environment by \"ANDROID_NDK_HOME\"",
+                            metavar="path")
+    except argparse.ArgumentError:
+        pass
     if category:
         parser = parser.add_argument_group("crash")
         required = False
@@ -107,14 +118,6 @@ def generate_help(parser, category=False):
                       help="The crash dump. This is an optional parameter."
                            " If omitted, parse_stack will read input data from stdin",
                       metavar="file", required=required)
-    parser.add_argument("-o", "--out", dest="out",
-                        help="write the result into the out file. If omitted,"
-                        " the result is written into the stdout",
-                        metavar="file")
-    parser.add_argument("--android_ndk_home", dest="ndk_home",
-                        help="path of the Android NDK home[optional]. If omitted,"
-                        " get it from environment by \"ANDROID_NDK_HOME\"",
-                        metavar="path")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Analyze the crash stack to print crash functions")
