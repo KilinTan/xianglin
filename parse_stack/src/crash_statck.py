@@ -61,6 +61,7 @@ def parse_crash_stack(args):
     else:
         output = sys.stdout
     parse_rs = []
+    print_flag = False
     while True:
         try:
             line = stack.readline()
@@ -68,6 +69,8 @@ def parse_crash_stack(args):
             break
         if not line:
             break
+        if line.find("*** *** ***") != -1:
+            print_flag = False
         if line.strip() == "print":
             print_crash_stack(output, parse_rs)
             parse_rs = []
@@ -80,13 +83,15 @@ def parse_crash_stack(args):
 
         func, src, line = execute_addr2line(args.addr2line, libpath, addr)
         if func and src and line:
-            parse_rs.append("0x%08x:%32s    %s:%s" % (addr, func, src, line))
+            if print_flag:
+                output.write("0x%08x:%32s\t\t%s:%s\n" % (addr, func, src, line))
+            else:
+                parse_rs.append("0x%08x:%32s\t\t%s:%s" % (addr, func, src, line))
 
     if len(parse_rs) > 0:
         print_crash_stack(output, parse_rs)
         parse_rs = []
     return 0
-
 
 def generate_help(parser, category=False):
     if not parser:
@@ -95,6 +100,13 @@ def generate_help(parser, category=False):
     parser.add_argument('-s', "--symbols", dest="symbols",
                         help="Contains full path to the root directory for symbols.",
                         metavar="path", required=True)
+    if category:
+        parser = parser.add_argument_group("crash")
+        required = False
+    parser.add_argument('-d', "--dump", dest="dump",
+                      help="The crash dump. This is an optional parameter."
+                           " If omitted, parse_stack will read input data from stdin",
+                      metavar="file", required=required)
     parser.add_argument("-o", "--out", dest="out",
                         help="write the result into the out file. If omitted,"
                         " the result is written into the stdout",
@@ -103,13 +115,6 @@ def generate_help(parser, category=False):
                         help="path of the Android NDK home[optional]. If omitted,"
                         " get it from environment by \"ANDROID_NDK_HOME\"",
                         metavar="path")
-    if category:
-        parser = parser.add_argument_group("crash")
-        required = False
-    parser.add_argument('-d', "--dump", dest="dump",
-                      help="The crash dump. This is an optional parameter."
-                           " If omitted, parse_stack will read input data from stdin",
-                      metavar="file", required=required)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Analyze the crash stack to print crash functions")
