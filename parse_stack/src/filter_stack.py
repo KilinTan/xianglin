@@ -16,6 +16,7 @@
 #
 
 import sys
+import os
 
 def read_allocation_block(fp, filter_str, included = True):
     if fp == None or filter_str == None:
@@ -53,17 +54,18 @@ def write_allocation_block(fp, block):
         fp.write(b+"\n")
     fp.write("\n")
 
-if __name__ == "__main__":
-    if len(sys.argv) > 3:
-        org_alloc = open(sys.argv[1], "r");
-        new_alloc = open(sys.argv[2], "w");
-        filter_str = sys.argv[3];
-    elif len(sys.argv) == 3:
-        org_alloc = open(sys.argv[1], "r");
-        new_alloc = sys.stdout
-        filter_str = sys.argv[2];
+def filter_stack(org_file, new_file=None, filter_str=None):
+    if not (org_file and filter_str):
+        print("Invalid arguments")
+        return 1
+    if not os.path.isfile(org_file):
+        print("The original file(%s( is not exited" % (org_file))
+        return 2 
+    org_alloc = open(org_file, "r");
+    if new_file:
+        new_alloc = open(new_file, "w");
     else:
-        exit(-1)
+        new_alloc = sys.stdout
     included = True
     if filter_str[0] == '!':
         filter_str = filter_str[1:]
@@ -76,3 +78,14 @@ if __name__ == "__main__":
             break
     org_alloc.close()
     new_alloc.close()
+    return 0
+
+if __name__ == "__main__":
+    if len(sys.argv) > 3:
+        rs = filter_stack(sys.argv[1], sys.argv[2], sys.argv[3])
+    elif len(sys.argv) == 3:
+        rs = filter_stack(sys.argv[1], None, sys.argv[2])
+    else:
+        print("Usage: %s original_file new_file filter_string" % (sys.argv[0]))
+        exit(1)
+    exit(0)
