@@ -17,30 +17,81 @@
 
 import sys
 
+def read_allocation_block(fp, filter_str, included = True):
+    if fp == None or filter_str == None:
+        return
+    line = fp.readline();
+    found = False
+    block = []
+    begin = False;
+    while line:
+        l = line.rstrip();
+        if line.find("Allocations:") != -1:
+            begin = True
+            block.append(l)
+        elif line.find("EndStacktrace") != -1:
+            block.append(l)
+            break;
+        elif not l:
+            break;
+        elif begin == True:
+            if (not found) and (line.find(filter_str) != -1):
+                found = True
+            block.append(l)
+        line = fp.readline()
+    if not line:
+        return None
+    if found and included:
+        return block
+    elif not (found or included):
+        return block
+    else:
+        return []
+
+def write_allocation_block(fp, block):
+    for b in block:
+        fp.write(b+"\n")
+    fp.write("\n")
 if __name__ == "__main__":
-    org_alloc = file(sys.argv[1]);
-    new_alloc = file(sys.argv[2], "w");
-    filter_str = sys.argv[3];
-    print filter_str
-    include = True
+    if len(sys.argv) > 3:
+        org_alloc = open(sys.argv[1], "r");
+        new_alloc = open(sys.argv[2], "w");
+        filter_str = sys.argv[3];
+    elif len(sys.argv) == 3:
+        org_alloc = open(sys.argv[1], "r");
+        new_alloc = sys.stdout
+        filter_str = sys.argv[2];
+    else:
+        exit(-1)
+    included = True
     if filter_str[0] == '!':
         filter_str = filter_str[1:]
-        include = False
-    alloc_array = []
-    flag = False
-    write_flag = False
-    for line in org_alloc:
-        if line.find("Allocations:") == 0:
-            if not flag:
-                flag = True
-            else:
-                if (include and write_flag) or (not include and not write_flag):
-                    for l in alloc_array:
-                        new_alloc.write(l)
-                        print l,
-                alloc_array = []
-                write_flag = False
-        alloc_array.append(line)
-        
-        if line.find(filter_str) != -1:
-            write_flag = True
+        included = False
+    while True:
+        block = read_allocation_block(org_alloc, filter_str, included)
+        if block and len(block) > 0:
+            write_allocation_block(new_alloc, block)
+        elif block == None:
+            break
+    org_alloc.close()
+    new_alloc.close()
+    
+#    print filter_str
+#    alloc_array = []
+#    flag = False
+#    write_flag = False
+#    for line in org_alloc:
+#        if line.find("Allocations:") == 0:
+#            if not flag:
+#                flag = True
+#            else:
+#                if (include and write_flag) or (not include and not write_flag):
+#                    for l in alloc_array:
+#                        new_alloc.write(l)
+#                        print l,
+#                alloc_array = []
+#                write_flag = False
+#        alloc_array.append(line)
+#        
+#        if line.find(filter_str) != -1:
+#            write_flag = True
