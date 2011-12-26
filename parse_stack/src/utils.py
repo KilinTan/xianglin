@@ -66,3 +66,24 @@ def execute_addr2line(addr2line, libpath, addr):
     src = fp.readline().strip()
     src = src.split(":")
     return (func, src[0], src[1])
+
+def check_args(args):
+    if args.symbols is None:
+        sys.stderr.write("The symbols is required\n")
+        return 1
+    elif not os.path.exists(args.symbols):
+        sys.stderr.write("The symbols(%s) is not existed\n" %(args.symbols))
+        return 1
+
+    if args.ndk_home:
+        if os.path.exists(args.ndk_home):
+            args.addr2line = search_file(os.path.join(args.ndk_home, "toolchains"), "^arm.*addr2line$", True)
+        else:
+            sys.stderr.write("The path[%s] is incorrect android_ndk_home\n" %(args.ndk_home))
+            return 1
+    else:
+        args.addr2line = find_addr2line()
+    if not args.addr2line:
+        sys.stderr.write("Can find the addr2line command from the ANDROID_NDK_HOME.\n")
+        return 1
+    return 0
