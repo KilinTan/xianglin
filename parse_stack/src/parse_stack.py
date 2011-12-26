@@ -225,7 +225,7 @@ if __name__=="__main__":
         exit(1)
     else:
         if not os.path.exists(options.symbols):
-            sys.stderr.write("The symbols is not existed\n" %(options.symbols))
+            sys.stderr.write("The symbols(%s) is not existed\n" %(options.symbols))
             exit(1)
 
     if options.dump is not None:
