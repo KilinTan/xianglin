@@ -15,12 +15,7 @@
 # limitations under the License.
 #
 
-import sys
-import re
-import os
-import subprocess
 import argparse
-from subprocess import Popen 
 
 import crash_statck 
 import memory_stack
