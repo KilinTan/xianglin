@@ -1,6 +1,31 @@
 Parse stack project
 The python script can help us to anaylse the android native crash stack
-1. filter_stack.py
+1. filter_stack.py 
+  Filter the specify file to reduce the unnecessary information. It just handles the memory stack file.
+  Uesage:
+    filter_stack.py memory_stack.txt [new_file.txt] filter_string
+  The parameter new_file can be ommited. If ommitted, The filtered result is printed into the stdout.
 2. memory_stack.py
+  Parser the memory stack to find the memory leak. It find which memory is not freed. The script depends the Android SDK and Android NDK. The commands adb and arm-eabm*-addr2line are used. So you MUST add the adb into the path and setup the environment ANDROID_NDK_HOME path to the Android NDK. The ANDROID_NDK_HOME is optional. You can use --android_ndk_home=/path/to/ndk replace it. 
+  Uesage:
+    memory_stack.py -s <symbols folder> -a <memory_stack file> -p <process_name> [-o <output file>]
+  Example:
+    see  
 3. crash_stack.py
+  Parse the native crash stack to find where the crash is appeared in code. It can get the function, file and line number. It can help us exactly locate which code bring to the crash. The script support stdin, stdout and pipe.
+  Uesage:
+    crash_stack.py -s <symbols folder> -d <crash stack file> [-o <output file>]
+    crash_stack.py -s <symbols folder> < "scrash_file" > "output file"
+    adb logcat | crash_stack.py -s <symbols> [-o <output file>]
+  If the output file is ommitted, the parse result is printed into the stdout. Even the crash file is ommitted also. If the crash and output files are ommitted, the script try to read the crash file from stdin and print the result into the stdout. Like the following:
+    crash_stack.py -s <symbols>
+    paste the crash content into the stdin. Click the enter key. You don't see any result is printed. Then input the "print" and click the enter key. The result would be showed in the stdout.
+  Example:
+    see
+  
 4. parse_stack.py
+  The script just integrates the memory_stack.py and crash_stack.py.
+  Parse the memory stack file:
+  parse_stack.py -s <symbols> -a <memory stack file> -p <process_name> -o <output file>
+  Parse the crash stack file:
+  parse_stack.py -s <symbols> -d <crash stack file>
